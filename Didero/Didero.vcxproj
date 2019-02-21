@@ -136,12 +136,18 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="quotefetcher.cpp" />
+    <ClCompile Include="utilities.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="aliases.h" />
+    <ClInclude Include="dbinfo.h" />
     <ClInclude Include="insertquery.h" />
     <ClInclude Include="queryfactory.h" />
     <ClInclude Include="quote.h" />
+    <ClInclude Include="utilities.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="connection_info.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

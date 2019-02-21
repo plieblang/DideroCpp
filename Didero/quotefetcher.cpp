@@ -1,5 +1,7 @@
+#include "dbinfo.h"
 #include "insertquery.h"
 #include "quote.h"
+#include "utilities.h"
 #include <mysql/mysql.h>
 
 #define DB_PORT 3306
@@ -8,11 +10,14 @@
 const crs_string Quote::fields[] = { U("symbol"), U("price"), U("bid"), U("ask"), U("timestamp") };
 
 static crs_string forexUrl, forexApiKey;
-static crs_string dbUrl, dbUsername, dbPassword;
 
-void setData() {
+void setData(DbInfo *db) {
+	static crs_string dbUrl, dbUsername, dbPassword;
 	utility::ifstream_t in("connection_info.txt");
 	in >> forexUrl >> forexApiKey >> dbUrl >> dbUsername >> dbPassword;
+	convertToNarrowStr(dbUrl, db->url, DB_INFO_STRLEN);
+	convertToNarrowStr(dbUsername, db->username, DB_INFO_STRLEN);
+	convertToNarrowStr(dbPassword, db->password, DB_INFO_STRLEN);
 }
 
 crs_string constructURL(const crs_string &firstCurrency, const crs_string &secondCurrency) {
@@ -62,10 +67,10 @@ pplx::task<void> getQuotes(std::vector<Quote> &quotes) {
 	});
 }
 
-void storeQuotesInDB(const std::vector<Quote> &quotes) {
+void storeQuotesInDB(const std::vector<Quote> &quotes, const DbInfo &db) {
 	MYSQL connection;
 	mysql_init(&connection);
-	mysql_real_connect(&connection, DB_URL, DB_USER, DB_PASSWORD, NULL, DB_PORT, NULL, 0);
+	mysql_real_connect(&connection, db.url, db.username, db.password, NULL, DB_PORT, NULL, 0);
 	//mysql_query(&connection, "CREATE DATABASE quotedb");
 	mysql_query(&connection, "DROP TABLE IF EXISTS quotetable");
 	int rv = mysql_query(&connection, "CREATE TABLE quotetable(symbol VARCHAR(6), price DECIMAL, bid DECIMAL, ask DECIMAL, time TIMESTAMP)");
@@ -79,7 +84,8 @@ void storeQuotesInDB(const std::vector<Quote> &quotes) {
 }
 
 int main() {
-	setData();
+	DbInfo db;
+	setData(&db);
 
 	//std::vector<Quote> quotes;
 	//getQuotes(quotes).wait();
