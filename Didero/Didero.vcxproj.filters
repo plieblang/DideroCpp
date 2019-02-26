@@ -24,33 +24,33 @@
     <ClInclude Include="queryfactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="insertquery.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="utilities.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="dbinfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="quotefetcher.h">
+    <ClInclude Include="main.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="main.h">
+    <ClInclude Include="insertionquery.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="quotestorer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="quotefetcher.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="utilities.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="insertquery.cpp">
+    <ClCompile Include="insertionquery.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="quotestorer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

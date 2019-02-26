@@ -6,9 +6,15 @@ int main() {
 	in >> forexUrl >> forexApiKey >> dbUrl >> dbUsername >> dbPassword;
 	DbInfo db(dbUrl, dbUsername, dbPassword);
 
+	MYSQL connection;
+	mysql_init(&connection);
+	mysql_real_connect(&connection, db.url, db.username, db.password, NULL, DB_PORT, NULL, 0);
+
 	std::queue<Quote> quotes;
 	while (true) {
-		getQuotes(quotes, forexUrl, forexApiKey).wait();
-		//storeQuotesInDB(quotes);
+		storeQuote(forexUrl, forexApiKey).wait();
+		//storeQuotesInDB(quotes, db);
 	}
+
+	mysql_close(&connection);
 }

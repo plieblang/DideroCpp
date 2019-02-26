@@ -4,6 +4,8 @@
 #include "aliases.h"
 #include "dbinfo.h"
 #include "quote.h"
-#include "quotefetcher.h"
+#include "quotestorer.h"
+
+extern MYSQL connection;
 
 #endif

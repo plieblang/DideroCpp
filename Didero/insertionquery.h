@@ -5,13 +5,13 @@
 #include "queryfactory.h"
 #include "quote.h"
 
-class InsertQuery : QueryFactory {
+class InsertionQuery : QueryFactory {
 	char query[MAX_QUERY_LEN];
 
 	int constructQuery(const Quote &quote, const char *givenQuery);
 
 public:
-	InsertQuery(const Quote &quote, const char *givenQuery);
+	InsertionQuery(const Quote &quote, const char *givenQuery);
 
 	char *getQuery();
 };

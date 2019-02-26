@@ -10,11 +10,10 @@
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
-#include <queue>
 #include <string>
+#include <thread>
 #include <time.h>
 
 using crs_string = utility::string_t;
-using crs_json_value = web::json::value;
 
 #endif

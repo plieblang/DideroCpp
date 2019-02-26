@@ -135,19 +135,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="insertquery.cpp" />
+    <ClCompile Include="insertionquery.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="quotefetcher.cpp" />
+    <ClCompile Include="quotestorer.cpp" />
     <ClCompile Include="utilities.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="aliases.h" />
     <ClInclude Include="dbinfo.h" />
-    <ClInclude Include="insertquery.h" />
+    <ClInclude Include="insertionquery.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="queryfactory.h" />
     <ClInclude Include="quote.h" />
-    <ClInclude Include="quotefetcher.h" />
+    <ClInclude Include="quotestorer.h" />
     <ClInclude Include="utilities.h" />
   </ItemGroup>
   <ItemGroup>

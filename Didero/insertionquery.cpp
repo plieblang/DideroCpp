@@ -1,10 +1,10 @@
-#include "insertquery.h"
+#include "insertionquery.h"
 
-InsertQuery::InsertQuery(const Quote &quote, const char *givenQuery) {
+InsertionQuery::InsertionQuery(const Quote &quote, const char *givenQuery) {
 	constructQuery(quote, givenQuery);
 }
 
-int InsertQuery::constructQuery(const Quote &quote, const char *givenQuery) {
+int InsertionQuery::constructQuery(const Quote &quote, const char *givenQuery) {
 	constexpr size_t bufferSize = 32;
 	char buf[bufferSize];
 
@@ -30,6 +30,6 @@ int InsertQuery::constructQuery(const Quote &quote, const char *givenQuery) {
 	return 0;
 }
 
-char *InsertQuery::getQuery() {
+char *InsertionQuery::getQuery() {
 	return query;
 }
