@@ -6,12 +6,13 @@
 #include <cpprest/http_msg.h>
 #include <cpprest/json.h>
 #include <pplx/pplxtasks.h>
+#include <mysql/mysql.h>
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include <queue>
 #include <string>
 #include <time.h>
-#include <vector>
 
 using crs_string = utility::string_t;
 using crs_json_value = web::json::value;

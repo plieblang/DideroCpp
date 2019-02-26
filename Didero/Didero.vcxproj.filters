@@ -33,12 +33,24 @@
     <ClInclude Include="dbinfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="quotefetcher.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="main.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="quotefetcher.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="utilities.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="insertquery.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

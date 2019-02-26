@@ -2,7 +2,6 @@
 #define _QUERY_BUILDER_H
 
 #include "aliases.h"
-#include "quote.h"
 
 #define MAX_QUERY_LEN 1024
 

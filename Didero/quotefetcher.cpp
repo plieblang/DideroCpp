@@ -1,31 +1,42 @@
-#include "dbinfo.h"
-#include "insertquery.h"
-#include "quote.h"
-#include "utilities.h"
-#include <mysql/mysql.h>
-
-#define DB_PORT 3306
-#define TABLE_NAME "deleteme"
+#include "quotefetcher.h"
 
 const crs_string Quote::fields[] = { U("symbol"), U("price"), U("bid"), U("ask"), U("timestamp") };
 
-static crs_string forexUrl, forexApiKey;
-
-void setData(DbInfo *db) {
-	static crs_string dbUrl, dbUsername, dbPassword;
-	utility::ifstream_t in("connection_info.txt");
-	in >> forexUrl >> forexApiKey >> dbUrl >> dbUsername >> dbPassword;
-	convertToNarrowStr(dbUrl, db->url, DB_INFO_STRLEN);
-	convertToNarrowStr(dbUsername, db->username, DB_INFO_STRLEN);
-	convertToNarrowStr(dbPassword, db->password, DB_INFO_STRLEN);
-}
-
-crs_string constructURL(const crs_string &firstCurrency, const crs_string &secondCurrency) {
+crs_string constructURL(const crs_string forexUrl, const crs_string forexApiKey, const crs_string &firstCurrency, const crs_string &secondCurrency) {
 	return forexUrl + firstCurrency + secondCurrency + forexApiKey;
 }
 
-pplx::task<void> getQuotes(std::vector<Quote> &quotes) {
-	web::uri url(constructURL(U("USD"), U("EUR")));
+void storeQuoteInQueue(std::queue<Quote> &quotes, pplx::task<web::json::value> *previousTask) {
+	crs_json_value jsonData = previousTask->get();
+	for (int i = 0; i < jsonData.size(); i++) {
+		crs_string symbol;
+		double price, bid, ask;
+		time_t timestamp;
+
+		auto entry = jsonData[i];
+		for (auto prop : Quote::fields) {
+			auto data = entry[prop];
+			utility::stringstream_t stream;
+			data.serialize(stream);
+
+			if (prop == U("symbol")) {
+				stream >> symbol;
+			} else if (prop == U("price")) {
+				stream >> price;
+			} else if (prop == U("bid")) {
+				stream >> bid;
+			} else if (prop == U("ask")) {
+				stream >> ask;
+			} else stream >> timestamp;
+		}
+
+		Quote q(symbol, price, bid, ask, timestamp);
+		quotes.emplace(q);
+	}
+}
+
+pplx::task<void> getQuotes(std::queue<Quote> &quotes, const crs_string forexUrl, const crs_string forexApiKey) {
+	web::uri url(constructURL(forexUrl, forexApiKey, U("USD"), U("EUR")));
 	web::http::client::http_client client(url);
 	web::http::http_request request;
 
@@ -38,32 +49,8 @@ pplx::task<void> getQuotes(std::vector<Quote> &quotes) {
 			return pplx::task_from_result(web::json::value());
 		}
 	}).then([&quotes](pplx::task<web::json::value> previousTask) {
-		crs_json_value jsonData = previousTask.get();
-		for (int i = 0; i < jsonData.size(); i++) {
-			crs_string symbol;
-			double price, bid, ask;
-			time_t timestamp;
-
-			auto entry = jsonData[i];
-			for (auto prop : Quote::fields) {
-				auto data = entry[prop];
-				utility::stringstream_t stream;
-				data.serialize(stream);
-
-				if (prop == U("symbol")) {
-					stream >> symbol;
-				} else if (prop == U("price")) {
-					stream >> price;
-				} else if (prop == U("bid")) {
-					stream >> bid;
-				} else if (prop == U("ask")) {
-					stream >> ask;
-				} else stream >> timestamp;
-			}
-
-			Quote q(symbol, price, bid, ask, timestamp);
-			quotes.emplace_back(q);
-		}
+		auto prevTask = &previousTask;
+		storeQuoteInQueue(quotes, prevTask);
 	});
 }
 
@@ -81,13 +68,4 @@ void storeQuotesInDB(const std::vector<Quote> &quotes, const DbInfo &db) {
 	}
 
 	mysql_close(&connection);
-}
-
-int main() {
-	DbInfo db;
-	setData(&db);
-
-	//std::vector<Quote> quotes;
-	//getQuotes(quotes).wait();
-	//storeQuotesInDB(quotes);
 }
