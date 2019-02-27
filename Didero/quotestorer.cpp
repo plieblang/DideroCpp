@@ -57,7 +57,6 @@ pplx::task<void> storeQuote(const crs_string &forexUrl, const crs_string &forexA
 			return pplx::task_from_result(web::json::value());
 		}
 	}).then([](pplx::task<web::json::value> previousTask) {
-		Quote q = createQuote(previousTask);
-		std::thread t(storeQuoteInDB, q);
+		storeQuoteInDB(createQuote(previousTask));
 	});
 }

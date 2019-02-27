@@ -8,11 +8,10 @@
 #include <pplx/pplxtasks.h>
 #include <mysql/mysql.h>
 #include <cstdlib>
+#include <ctime>
 #include <fstream>
 #include <iostream>
 #include <string>
-#include <thread>
-#include <time.h>
 
 using crs_string = utility::string_t;
 
