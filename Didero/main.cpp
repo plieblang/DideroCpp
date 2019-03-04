@@ -1,5 +1,13 @@
 #include "main.h"
 
+int initializeDb(MYSQL *connection) {
+	int rv = mysql_query(connection, "CREATE DATABASE quotedb");
+	if (!rv) {
+		return mysql_query(connection, "CREATE TABLE quotetable(symbol VARCHAR(6), price DECIMAL, bid DECIMAL, ask DECIMAL, time TIMESTAMP)");
+	}
+	return -1;
+}
+
 int main() {
 	crs_string forexUrl, forexApiKey, dbUrl, dbUsername, dbPassword;
 	utility::ifstream_t in("connection_info.txt");
@@ -7,13 +15,21 @@ int main() {
 	DbInfo db(dbUrl, dbUsername, dbPassword);
 
 	MYSQL connection;
-	mysql_init(&connection);
-	mysql_real_connect(&connection, db.url, db.username, db.password, NULL, DB_PORT, NULL, 0);
+	MYSQL *connectionPtr = mysql_init(&connection);
+	if (connectionPtr) {
+		connectionPtr = mysql_real_connect(connectionPtr, db.url, db.username, db.password, NULL, DB_PORT, NULL, 0);
+	}
 
-	std::queue<Quote> quotes;
-	while (true) {
+	int rv = -1;
+	if (connectionPtr) {
+		rv = initializeDb(connectionPtr);
+	}
+
+	if (!rv) {
 		storeQuote(forexUrl, forexApiKey).wait();
-		//storeQuotesInDB(quotes, db);
+		//while (true) {
+		//	storeQuote(forexUrl, forexApiKey).wait();
+		//}
 	}
 
 	mysql_close(&connection);

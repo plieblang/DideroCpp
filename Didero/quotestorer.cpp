@@ -4,11 +4,8 @@
 const crs_string Quote::fields[] = { U("symbol"), U("price"), U("bid"), U("ask"), U("timestamp") };
 MYSQL connection;
 
-//mysql_query(&connection, "CREATE DATABASE quotedb");
-//mysql_query(&connection, "DROP TABLE IF EXISTS quotetable");
-//int rv = mysql_query(&connection, "CREATE TABLE quotetable(symbol VARCHAR(6), price DECIMAL, bid DECIMAL, ask DECIMAL, time TIMESTAMP)");
-void storeQuoteInDB(const Quote &quote) {
-	InsertionQuery iq(quote, "insert");
+void storeQuoteInDB(Quote &quote) {
+	InsertionQuery iq(quote);
 	mysql_query(&connection, iq.getQuery());
 }
 
@@ -57,6 +54,7 @@ pplx::task<void> storeQuote(const crs_string &forexUrl, const crs_string &forexA
 			return pplx::task_from_result(web::json::value());
 		}
 	}).then([](pplx::task<web::json::value> previousTask) {
-		storeQuoteInDB(createQuote(previousTask));
+		Quote q = createQuote(previousTask);
+		storeQuoteInDB(q);
 	});
 }

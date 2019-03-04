@@ -7,7 +7,7 @@
 
 class QueryFactory {
 public:
-	virtual char *getQuery() = 0;
+	virtual char *getQuery() const = 0;
 };
 
 #endif

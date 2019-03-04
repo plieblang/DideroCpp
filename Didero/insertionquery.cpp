@@ -1,14 +1,15 @@
 #include "insertionquery.h"
 
-InsertionQuery::InsertionQuery(const Quote &quote, const char *givenQuery) {
-	constructQuery(quote, givenQuery);
+InsertionQuery::InsertionQuery(const Quote &quote) {
+	constructQuery(quote);
 }
 
-int InsertionQuery::constructQuery(const Quote &quote, const char *givenQuery) {
+int InsertionQuery::constructQuery(const Quote &quote) {
 	constexpr size_t bufferSize = 32;
 	char buf[bufferSize];
 
-	strcat_s(query, MAX_QUERY_LEN, "INSERT INTO quotetable VALUES('");
+	strcpy_s(query, MAX_QUERY_LEN, "INSERT INTO quotetable VALUES('");
+
 	strcat_s(query, MAX_QUERY_LEN, quote.getSymbol());
 	strcat_s(query, MAX_QUERY_LEN, "',");
 
@@ -30,6 +31,6 @@ int InsertionQuery::constructQuery(const Quote &quote, const char *givenQuery) {
 	return 0;
 }
 
-char *InsertionQuery::getQuery() {
-	return query;
+char *InsertionQuery::getQuery() const {
+	return (char*)query;
 }

@@ -3,6 +3,6 @@
 
 #include "aliases.h"
 
-size_t convertToNarrowStr(const crs_string &wsource, char *dest, size_t destSize);
+int convertToNarrowStr(const crs_string &source, char *dest, size_t destSize);
 
 #endif

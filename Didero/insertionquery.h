@@ -8,12 +8,12 @@
 class InsertionQuery : QueryFactory {
 	char query[MAX_QUERY_LEN];
 
-	int constructQuery(const Quote &quote, const char *givenQuery);
+	int constructQuery(const Quote &quote);
 
 public:
-	InsertionQuery(const Quote &quote, const char *givenQuery);
+	InsertionQuery(const Quote &quote);
 
-	char *getQuery();
+	char *getQuery() const;
 };
 
 #endif
