@@ -1,11 +1,10 @@
 #include "main.h"
 
 int initializeDb(MYSQL *connection) {
-	//int rv = mysql_query(connection, "CREATE DATABASE quotedb");
-	int rv = 0;
+	int rv = 0;// mysql_query(connection, "CREATE DATABASE quotedb");
 	if (!rv) {
 		mysql_query(connection, "DROP TABLE IF EXISTS quotetable");
-		return mysql_query(connection, "CREATE TABLE quotetable(symbol TEXT, price DECIMAL, bid DECIMAL, ask DECIMAL, time TIMESTAMP)");
+		return mysql_query(connection, "CREATE TABLE quotetable(symbol TEXT, price DOUBLE, bid DOUBLE, ask DOUBLE, time BIGINT)");
 	}
 	return -1;
 }

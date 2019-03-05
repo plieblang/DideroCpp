@@ -3,10 +3,13 @@
 
 const crs_string Quote::fields[] = { U("symbol"), U("price"), U("bid"), U("ask"), U("timestamp") };
 
-void storeQuoteInDB(MYSQL *connection, Quote &quote) {
+int storeQuoteInDB(MYSQL *connection, Quote &quote) {
 	InsertionQuery iq(quote);
-	mysql_query(connection, iq.getQuery());
-	std::cout << mysql_error(connection);
+	int rv = mysql_query(connection, iq.getQuery());
+	if (rv) {
+		std::cout << mysql_error(connection);
+	}
+	return rv;
 }
 
 crs_string constructURL(const crs_string forexUrl, const crs_string forexApiKey, const crs_string &firstCurrency, const crs_string &secondCurrency) {
@@ -40,7 +43,7 @@ Quote createQuote(pplx::task<web::json::value> &previousTask) {
 	return q;
 }
 
-pplx::task<void> storeQuote( MYSQL *connection, const crs_string &forexUrl, const crs_string &forexApiKey) {
+pplx::task<void> storeQuote(MYSQL *connection, const crs_string &forexUrl, const crs_string &forexApiKey) {
 	web::uri url(constructURL(forexUrl, forexApiKey, U("USD"), U("EUR")));
 	web::http::client::http_client client(url);
 	web::http::http_request request;
