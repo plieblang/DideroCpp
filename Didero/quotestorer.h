@@ -9,6 +9,6 @@
 #define DB_PORT 3306
 #define TABLE_NAME "deleteme"
 
-pplx::task<void> storeQuote(const crs_string &forexUrl, const crs_string &forexApiKey);
+pplx::task<void> storeQuote(MYSQL *connection, const crs_string &forexUrl, const crs_string &forexApiKey);
 
 #endif

@@ -11,22 +11,24 @@ int InsertionQuery::constructQuery(const Quote &quote) {
 	strcpy_s(query, MAX_QUERY_LEN, "INSERT INTO quotetable VALUES('");
 
 	strcat_s(query, MAX_QUERY_LEN, quote.getSymbol());
-	strcat_s(query, MAX_QUERY_LEN, "',");
+	strcat_s(query, MAX_QUERY_LEN, "', ");
 
 	snprintf(buf, bufferSize, "%f", quote.getPrice());
 	strcat_s(query, MAX_QUERY_LEN, buf);
-	strcat_s(query, MAX_QUERY_LEN, ",");
+	strcat_s(query, MAX_QUERY_LEN, ", ");
 
 	snprintf(buf, bufferSize, "%f", quote.getBid());
 	strcat_s(query, MAX_QUERY_LEN, buf);
-	strcat_s(query, MAX_QUERY_LEN, ",");
+	strcat_s(query, MAX_QUERY_LEN, ", ");
 
 	snprintf(buf, bufferSize, "%f", quote.getAsk());
 	strcat_s(query, MAX_QUERY_LEN, buf);
-	strcat_s(query, MAX_QUERY_LEN, ",");
+	strcat_s(query, MAX_QUERY_LEN, ", ");
 
 	snprintf(buf, bufferSize, "%lld", quote.getTimestamp());
 	strcat_s(query, MAX_QUERY_LEN, buf);
+
+	strcat_s(query, MAX_QUERY_LEN, ")");
 
 	return 0;
 }

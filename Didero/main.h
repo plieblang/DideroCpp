@@ -6,6 +6,4 @@
 #include "quote.h"
 #include "quotestorer.h"
 
-extern MYSQL connection;
-
 #endif

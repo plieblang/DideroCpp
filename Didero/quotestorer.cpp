@@ -2,11 +2,11 @@
 #include "main.h"
 
 const crs_string Quote::fields[] = { U("symbol"), U("price"), U("bid"), U("ask"), U("timestamp") };
-MYSQL connection;
 
-void storeQuoteInDB(Quote &quote) {
+void storeQuoteInDB(MYSQL *connection, Quote &quote) {
 	InsertionQuery iq(quote);
-	mysql_query(&connection, iq.getQuery());
+	mysql_query(connection, iq.getQuery());
+	std::cout << mysql_error(connection);
 }
 
 crs_string constructURL(const crs_string forexUrl, const crs_string forexApiKey, const crs_string &firstCurrency, const crs_string &secondCurrency) {
@@ -40,7 +40,7 @@ Quote createQuote(pplx::task<web::json::value> &previousTask) {
 	return q;
 }
 
-pplx::task<void> storeQuote(const crs_string &forexUrl, const crs_string &forexApiKey) {
+pplx::task<void> storeQuote( MYSQL *connection, const crs_string &forexUrl, const crs_string &forexApiKey) {
 	web::uri url(constructURL(forexUrl, forexApiKey, U("USD"), U("EUR")));
 	web::http::client::http_client client(url);
 	web::http::http_request request;
@@ -53,8 +53,8 @@ pplx::task<void> storeQuote(const crs_string &forexUrl, const crs_string &forexA
 			// return an empty JSON value
 			return pplx::task_from_result(web::json::value());
 		}
-	}).then([](pplx::task<web::json::value> previousTask) {
+	}).then([&connection](pplx::task<web::json::value> previousTask) {
 		Quote q = createQuote(previousTask);
-		storeQuoteInDB(q);
+		storeQuoteInDB(connection, q);
 	});
 }

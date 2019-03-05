@@ -15,6 +15,7 @@ class Quote {
 public:
 	Quote(crs_string symbol, double price, double bid, double ask, time_t time) {
 		convertToNarrowStr(symbol, this->symbol, SYMBOL_BUF_LEN);
+		stripQuotationMarks(this->symbol);
 		this->price = price;
 		this->bid = bid;
 		this->ask = ask;
