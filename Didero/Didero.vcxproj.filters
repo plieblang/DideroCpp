@@ -36,7 +36,10 @@
     <ClInclude Include="insertionquery.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="quotestorer.h">
+    <ClInclude Include="dbdata.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="quotefetcher.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -50,7 +53,7 @@
     <ClCompile Include="insertionquery.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="quotestorer.cpp">
+    <ClCompile Include="quotefetcher.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

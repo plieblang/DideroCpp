@@ -7,11 +7,15 @@
 #include <cpprest/json.h>
 #include <pplx/pplxtasks.h>
 #include <mysql/mysql.h>
+#include <chrono>
+#include <climits>
 #include <cstdlib>
 #include <ctime>
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <thread>
+#include <vector>
 
 using crs_string = utility::string_t;
 

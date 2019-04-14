@@ -34,5 +34,5 @@ int InsertionQuery::constructQuery(const Quote &quote) {
 }
 
 char *InsertionQuery::getQuery() const {
-	return (char*)query;
+	return (char *)query;
 }

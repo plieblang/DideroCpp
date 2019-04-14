@@ -6,7 +6,11 @@ int convertToNarrowStr(const crs_string &source, char *dest, size_t destSize) {
 }
 
 void stripQuotationMarks(char *str) {
-	int len = strlen(str);
+	size_t len = strlen(str);
 	strcpy_s(str, len, str + 1);
 	str[strlen(str) - 1] = 0;
+}
+
+crs_string constructURL(const crs_string forexUrl, const crs_string forexApiKey, const crs_string &firstCurrency, const crs_string &secondCurrency) {
+	return forexUrl + firstCurrency + secondCurrency + forexApiKey;
 }

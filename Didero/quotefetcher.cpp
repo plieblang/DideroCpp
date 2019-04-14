@@ -1,4 +1,4 @@
-#include "quotestorer.h"
+#include "quotefetcher.h"
 #include "main.h"
 
 const crs_string Quote::fields[] = { U("symbol"), U("price"), U("bid"), U("ask"), U("timestamp") };
@@ -10,10 +10,6 @@ int storeQuoteInDB(MYSQL *connection, Quote &quote) {
 		std::cout << mysql_error(connection);
 	}
 	return rv;
-}
-
-crs_string constructURL(const crs_string forexUrl, const crs_string forexApiKey, const crs_string &firstCurrency, const crs_string &secondCurrency) {
-	return forexUrl + firstCurrency + secondCurrency + forexApiKey;
 }
 
 Quote createQuote(pplx::task<web::json::value> &previousTask) {
@@ -43,21 +39,19 @@ Quote createQuote(pplx::task<web::json::value> &previousTask) {
 	return q;
 }
 
-pplx::task<void> storeQuote(MYSQL *connection, const crs_string &forexUrl, const crs_string &forexApiKey) {
-	web::uri url(constructURL(forexUrl, forexApiKey, U("USD"), U("EUR")));
+pplx::task<void> storeFromQuoteAfterDelay(MYSQL *connection, const web::uri &url, DbData &dbData, int milliDelay) {
+	std::this_thread::sleep_for(std::chrono::milliseconds(milliDelay));
+
 	web::http::client::http_client client(url);
 	web::http::http_request request;
 
 	return client.request(request).then([](web::http::http_response response) -> pplx::task<web::json::value> {
-		// If the status is OK extract the body of the response into a JSON value
 		if (response.status_code() == web::http::status_codes::OK) {
 			return response.extract_json();
 		} else {
-			// return an empty JSON value
 			return pplx::task_from_result(web::json::value());
 		}
-	}).then([&connection](pplx::task<web::json::value> previousTask) {
-		Quote q = createQuote(previousTask);
-		storeQuoteInDB(connection, q);
-	});
+		}).then([&connection, &dbData](pplx::task<web::json::value> previousTask) {
+			dbData.setProperties(createQuote(previousTask));
+			});
 }
