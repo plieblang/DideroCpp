@@ -7,8 +7,8 @@
 int initializeDb(MYSQL *connection) {
 	int rv = 0;// mysql_query(connection, "CREATE DATABASE quotedb");
 	if (!rv) {
-		mysql_query(connection, "DROP TABLE IF EXISTS quotetable");
-		return mysql_query(connection, "CREATE TABLE quotetable(symbol TEXT, price DOUBLE, bid DOUBLE, ask DOUBLE, time BIGINT)");
+		mysql_query(connection, "DROP TABLE IF EXISTS datatable");
+		return mysql_query(connection, "CREATE TABLE datatable(symbol TEXT, low DOUBLE, high DOUBLE, open DOUBLE, close DOUBLE, time BIGINT)");
 	}
 	return -1;
 }
@@ -44,6 +44,11 @@ int main() {
 			fetchTasks.wait();
 			//initialize the data structure to write data
 			//then actually write data
+			InsertionQuery iq(dbData);
+			rv = mysql_query(connection, iq.getQuery());
+			if (rv) {
+				std::cout << mysql_error(connection);
+			}
 			//std::this_thread::sleep_for(std::chrono::milliseconds(WRITE_INTERVAL));
 			//storeQuote(connection, forexUrl, forexApiKey).wait();
 		}

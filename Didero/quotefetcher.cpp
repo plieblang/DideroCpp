@@ -3,15 +3,6 @@
 
 const crs_string Quote::fields[] = { U("symbol"), U("price"), U("bid"), U("ask"), U("timestamp") };
 
-int storeQuoteInDB(MYSQL *connection, Quote &quote) {
-	InsertionQuery iq(quote);
-	int rv = mysql_query(connection, iq.getQuery());
-	if (rv) {
-		std::cout << mysql_error(connection);
-	}
-	return rv;
-}
-
 Quote createQuote(pplx::task<web::json::value> &previousTask) {
 	web::json::value jsonData = previousTask.get();
 	crs_string symbol;

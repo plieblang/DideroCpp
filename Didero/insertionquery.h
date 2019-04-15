@@ -2,16 +2,16 @@
 #define _INSERT_QUERY_H
 
 #include "aliases.h"
+#include "dbdata.h"
 #include "queryfactory.h"
-#include "quote.h"
 
 class InsertionQuery : QueryFactory {
 	char query[MAX_QUERY_LEN];
 
-	int constructQuery(const Quote &quote);
+	int constructQuery(const DbData &dbData);
 
 public:
-	InsertionQuery(const Quote &quote);
+	InsertionQuery(const DbData &dbData);
 
 	char *getQuery() const;
 };
