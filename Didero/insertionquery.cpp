@@ -4,8 +4,8 @@ InsertionQuery::InsertionQuery(const DbData &dbData) {
 	constructQuery(dbData);
 }
 
-int InsertionQuery::constructQuery(const DbData &dbData) {
-	constexpr size_t bufferSize = 32;
+void InsertionQuery::constructQuery(const DbData &dbData) {
+	constexpr size_t bufferSize = 33;
 	char buf[bufferSize];
 
 	strcpy_s(query, MAX_QUERY_LEN, "INSERT INTO datatable VALUES('");
@@ -33,10 +33,12 @@ int InsertionQuery::constructQuery(const DbData &dbData) {
 	strcat_s(query, MAX_QUERY_LEN, buf);
 
 	strcat_s(query, MAX_QUERY_LEN, ")");
-
-	return 0;
 }
 
-char *InsertionQuery::getQuery() const {
-	return (char *)query;
+bool InsertionQuery::execute(MYSQL *connection) {
+	//std::lock_guard<std::mutex> lg(mtx);
+	if (!mysql_query(connection, query)) {
+		return true;
+	}
+	return false;
 }

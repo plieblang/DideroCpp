@@ -1,10 +1,10 @@
 #include "main.h"
 
 #define WRITE_INTERVAL 1000
-#define FETCH_INTERVAL 50
+#define FETCH_INTERVAL 500
 #define FETCHES_PER_WRITE WRITE_INTERVAL / FETCH_INTERVAL
 
-int initializeDb(MYSQL *connection) {
+int initializeDb(MYSQL* connection) {
 	int rv = 0;// mysql_query(connection, "CREATE DATABASE quotedb");
 	if (!rv) {
 		mysql_query(connection, "DROP TABLE IF EXISTS datatable");
@@ -19,7 +19,7 @@ int main() {
 	in >> forexUrl >> forexApiKey >> dbUrl >> dbUsername >> dbPassword;
 	DbInfo db(dbUrl, dbUsername, dbPassword);
 
-	MYSQL *connection = mysql_init(NULL);
+	MYSQL* connection = mysql_init(NULL);
 	if (connection) {
 		connection = mysql_real_connect(connection, db.url, db.username, db.password, "quotedb", DB_PORT, NULL, 0);
 	}
@@ -34,6 +34,12 @@ int main() {
 		//Every second, create a list of tasks to be run at increasing intervals in the future
 		//Once all those tasks have returned, get the data from them and write it to the db
 		std::vector<pplx::task<void>> taskList(FETCHES_PER_WRITE);
+		//put write queries in a queue and execute anything in the queue as soon as possible
+		//will need to mutex the actual request
+		//eg https://stackoverflow.com/questions/11805232/multi-threaded-c-message-passing
+		std::queue<InsertionQuery> writeQueue;
+		std::mutex dumbMut;
+
 		while (true) {
 			DbData dbData;
 			for (int i = 0; i < FETCHES_PER_WRITE; i++) {
@@ -45,12 +51,21 @@ int main() {
 			//initialize the data structure to write data
 			//then actually write data
 			InsertionQuery iq(dbData);
-			rv = mysql_query(connection, iq.getQuery());
-			if (rv) {
-				std::cout << mysql_error(connection);
-			}
-			//std::this_thread::sleep_for(std::chrono::milliseconds(WRITE_INTERVAL));
-			//storeQuote(connection, forexUrl, forexApiKey).wait();
+			DeletionQuery dq(dbData.time);
+			//FIXME needs error checking
+			pplx::task<void> writeTask([iq, &connection, &dumbMut] {
+				//iq.execute(connection, dumbMut);
+				std::lock_guard<std::mutex> lg(dumbMut);
+				mysql_query(connection, iq.query);
+				});
+			writeTask.then([dq, &connection, &dumbMut] {
+				std::lock_guard<std::mutex> lg(dumbMut);
+				mysql_query(connection, dq.query);
+				});
+			//writeQueue.emplace(iq);
+			//if (iq.execute(connection)) {
+			//	std::cout << mysql_error(connection);
+			//}
 		}
 	}
 

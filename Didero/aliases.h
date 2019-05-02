@@ -7,12 +7,15 @@
 #include <cpprest/json.h>
 #include <pplx/pplxtasks.h>
 #include <mysql/mysql.h>
+#include <condition_variable>
 #include <chrono>
 #include <climits>
 #include <cstdlib>
 #include <ctime>
 #include <fstream>
 #include <iostream>
+#include <mutex>
+#include <queue>
 #include <string>
 #include <thread>
 #include <vector>

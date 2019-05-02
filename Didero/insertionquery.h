@@ -6,14 +6,17 @@
 #include "queryfactory.h"
 
 class InsertionQuery : QueryFactory {
-	char query[MAX_QUERY_LEN];
+	//char query[MAX_QUERY_LEN];
 
-	int constructQuery(const DbData &dbData);
+	void constructQuery(const DbData &dbData);
+
+	bool execute(MYSQL* connection);
 
 public:
-	InsertionQuery(const DbData &dbData);
+	static std::mutex iqMut;
+	char query[MAX_QUERY_LEN];
 
-	char *getQuery() const;
+	InsertionQuery(const DbData &dbData);
 };
 
 #endif

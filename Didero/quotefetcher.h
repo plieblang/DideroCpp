@@ -4,7 +4,6 @@
 #include "aliases.h"
 #include "dbdata.h"
 #include "dbinfo.h"
-#include "insertionquery.h"
 #include "quote.h"
 
 #define DB_PORT 3306

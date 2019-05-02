@@ -135,6 +135,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="deletionquery.cpp" />
     <ClCompile Include="insertionquery.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="queryqueue.cpp" />
@@ -145,6 +146,7 @@
     <ClInclude Include="aliases.h" />
     <ClInclude Include="dbdata.h" />
     <ClInclude Include="dbinfo.h" />
+    <ClInclude Include="deletionquery.h" />
     <ClInclude Include="insertionquery.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="queryfactory.h" />

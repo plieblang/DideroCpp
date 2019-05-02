@@ -7,7 +7,9 @@
 
 class QueryFactory {
 public:
-	virtual char *getQuery() const = 0;
+	virtual bool execute(MYSQL *connection) {
+		return false;
+	}
 };
 
 #endif
