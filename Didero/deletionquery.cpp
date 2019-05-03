@@ -13,7 +13,3 @@ void DeletionQuery::constructQuery(const time_t currentTime) {
 	snprintf(buf, bufferSize, "%lld", currentTime - maxAge);
 	strcat_s(query, MAX_QUERY_LEN, buf);
 }
-
-bool DeletionQuery::execute(MYSQL* connection) {
-	return false;
-}

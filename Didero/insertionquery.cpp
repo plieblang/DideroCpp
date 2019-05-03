@@ -34,11 +34,3 @@ void InsertionQuery::constructQuery(const DbData &dbData) {
 
 	strcat_s(query, MAX_QUERY_LEN, ")");
 }
-
-bool InsertionQuery::execute(MYSQL *connection) {
-	//std::lock_guard<std::mutex> lg(mtx);
-	if (!mysql_query(connection, query)) {
-		return true;
-	}
-	return false;
-}

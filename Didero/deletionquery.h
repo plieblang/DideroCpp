@@ -2,21 +2,14 @@
 #define _DELETE_QUERY_H
 
 #include "aliases.h"
-#include "queryfactory.h"
+#include "query.h"
 
-class DeletionQuery : QueryFactory {
-	//char query[MAX_QUERY_LEN];
-
+class DeletionQuery : public Query {
 	int maxAge = 1000;
 
 	void constructQuery(const time_t currentTime);
 
-	bool execute(MYSQL* connection);
-
 public:
-	static std::mutex iqMut;
-	char query[MAX_QUERY_LEN];
-
 	DeletionQuery(const time_t currentTime);
 };
 

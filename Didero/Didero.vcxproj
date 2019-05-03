@@ -138,7 +138,6 @@
     <ClCompile Include="deletionquery.cpp" />
     <ClCompile Include="insertionquery.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="queryqueue.cpp" />
     <ClCompile Include="quotefetcher.cpp" />
     <ClCompile Include="utilities.cpp" />
   </ItemGroup>
@@ -149,8 +148,7 @@
     <ClInclude Include="deletionquery.h" />
     <ClInclude Include="insertionquery.h" />
     <ClInclude Include="main.h" />
-    <ClInclude Include="queryfactory.h" />
-    <ClInclude Include="queryqueue.h" />
+    <ClInclude Include="query.h" />
     <ClInclude Include="quote.h" />
     <ClInclude Include="quotefetcher.h" />
     <ClInclude Include="utilities.h" />
