@@ -1,7 +1,7 @@
 #include "main.h"
 
 #define WRITE_INTERVAL 1000
-#define FETCH_INTERVAL 500
+#define FETCH_INTERVAL 1000
 #define FETCHES_PER_WRITE WRITE_INTERVAL / FETCH_INTERVAL
 
 int initializeDb(MYSQL *connection) {
@@ -11,6 +11,10 @@ int initializeDb(MYSQL *connection) {
 		return mysql_query(connection, "CREATE TABLE datatable(symbol TEXT, low DOUBLE, high DOUBLE, open DOUBLE, close DOUBLE, time BIGINT)");
 	}
 	return -1;
+}
+
+crs_string constructURL(const crs_string forexUrl, const crs_string forexApiKey, const crs_string &firstCurrency, const crs_string &secondCurrency) {
+	return forexUrl + U("&from_symbol=") + firstCurrency + U("&to_symbol=") + secondCurrency + U("&interval=1min&apikey=") + forexApiKey;
 }
 
 int main() {

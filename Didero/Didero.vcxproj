@@ -108,6 +108,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -126,6 +127,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -139,7 +141,6 @@
     <ClCompile Include="insertionquery.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="quotefetcher.cpp" />
-    <ClCompile Include="utilities.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="aliases.h" />
@@ -149,9 +150,7 @@
     <ClInclude Include="insertionquery.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="query.h" />
-    <ClInclude Include="quote.h" />
     <ClInclude Include="quotefetcher.h" />
-    <ClInclude Include="utilities.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="connection_info.txt" />

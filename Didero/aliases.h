@@ -12,6 +12,7 @@
 #include <climits>
 #include <cstdlib>
 #include <ctime>
+#include <cwchar>
 #include <fstream>
 #include <iostream>
 #include <mutex>
