@@ -10,10 +10,11 @@ protected:
 	char query[MAX_QUERY_LEN];
 
 public:
-	void execute(MYSQL *connection, std::mutex &mut) {
-		mut.lock();
-		mysql_query(connection, query);
-		mut.unlock();
+	pplx::task<int> execute(MYSQL *connection) {
+		auto rv = [&connection, this]() {
+			return mysql_query(connection, query);
+		};
+		return pplx::task_from_result(rv());
 	}
 };
 

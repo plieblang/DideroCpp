@@ -1,7 +1,7 @@
 #include "main.h"
 
-#define WRITE_INTERVAL 1000
-#define FETCH_INTERVAL 1000
+#define WRITE_INTERVAL 180000
+#define FETCH_INTERVAL 60000
 #define FETCHES_PER_WRITE WRITE_INTERVAL / FETCH_INTERVAL
 
 int initializeDb(MYSQL *connection) {
@@ -42,23 +42,33 @@ int main() {
 		//FIXME do actual error handling
 		while (true) {
 			try {
-				DbData dbData;
+				std::vector<DbData> quotes(FETCHES_PER_WRITE);
 				for (int i = 0; i < FETCHES_PER_WRITE; i++) {
 					web::uri url(constructURL(forexUrl, forexApiKey, U("USD"), U("EUR")));
-					taskList[i] = storeFromQuoteAfterDelay(connection, url, dbData, FETCH_INTERVAL * i);
+					taskList[i] = storeFromQuoteAfterDelay(connection, url, quotes[i], FETCH_INTERVAL * i);
 				}
 				auto fetchTasks = pplx::when_all(begin(taskList), end(taskList));
 				fetchTasks.wait();
-				//initialize the data structure to write data
-				//then actually write data
-				InsertionQuery iq(dbData);
-				DeletionQuery dq(dbData.time);
+
+				//set the data that we're actually going to write
+				DbData writeData = { quotes[0].low, quotes[0].high, quotes[0].open, quotes[0].close, quotes[0].time, quotes[0].symbol };
+				for (const auto &quote : quotes) {
+					if (quote.low < writeData.low) {
+						writeData.low = quote.low;
+					}
+					if (quote.high > writeData.high) {
+						writeData.high = quote.high;
+					}
+				}
+				writeData.close = quotes[quotes.size() - 1].close;
+				writeData.time = quotes[quotes.size() - 1].time;
+				InsertionQuery iq(writeData);
+				DeletionQuery dq(writeData.time);
 				std::mutex mut;
 				//FIXME needs error checking
-				pplx::task<void> writeTask([&iq, &dq, &connection, &mut] {
-					iq.execute(connection, mut);
-					dq.execute(connection, mut);
-					});
+				auto insertionTask = iq.execute(connection);
+				insertionTask.wait();
+				auto deletionTask = dq.execute(connection);
 			} catch (...) {
 				//FIXME log or do something here
 			}

@@ -67,7 +67,7 @@ DbData createQuote(pplx::task<web::json::value> &previousTask) {
 	}
 
 	auto entry = jsonData[U("Time Series FX (1min)")];
-	entry = entry[date];
+	entry = entry[date + U(" ") + timeStr];
 	crs_string propStr = U("");
 	for (auto prop : DbData::fields) {
 		auto data = entry[prop];
