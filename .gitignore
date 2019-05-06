@@ -4,5 +4,7 @@
 /Didero/Debug
 /Didero/Release
 /Didero/x64
+/DideroInstaller/Debug
+/DideroInstaller/Release
 /.vs
 /Didero/connection_info.txt

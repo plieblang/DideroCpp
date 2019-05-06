@@ -51,7 +51,7 @@ int main() {
 				fetchTasks.wait();
 
 				//set the data that we're actually going to write
-				DbData writeData = { quotes[0].low, quotes[0].high, quotes[0].open, quotes[0].close, quotes[0].time, quotes[0].symbol };
+				DbData writeData(quotes[0]);
 				for (const auto &quote : quotes) {
 					if (quote.low < writeData.low) {
 						writeData.low = quote.low;

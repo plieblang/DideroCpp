@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.329
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28803.352
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Didero", "Didero\Didero.vcxproj", "{5D3A0474-66E8-4D03-BDDD-8D264E7BC216}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "DideroInstaller", "DideroInstaller\DideroInstaller.vdproj", "{CD23E837-8A6A-4017-8287-247D2567A968}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{5D3A0474-66E8-4D03-BDDD-8D264E7BC216}.Release|x64.Build.0 = Release|x64
 		{5D3A0474-66E8-4D03-BDDD-8D264E7BC216}.Release|x86.ActiveCfg = Release|Win32
 		{5D3A0474-66E8-4D03-BDDD-8D264E7BC216}.Release|x86.Build.0 = Release|Win32
+		{CD23E837-8A6A-4017-8287-247D2567A968}.Debug|x64.ActiveCfg = Debug
+		{CD23E837-8A6A-4017-8287-247D2567A968}.Debug|x86.ActiveCfg = Debug
+		{CD23E837-8A6A-4017-8287-247D2567A968}.Release|x64.ActiveCfg = Release
+		{CD23E837-8A6A-4017-8287-247D2567A968}.Release|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
