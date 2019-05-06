@@ -62,6 +62,12 @@ int main() {
 				}
 				writeData.close = quotes[quotes.size() - 1].close;
 				writeData.time = quotes[quotes.size() - 1].time;
+
+				//make sure we have valid data
+				if (!writeData.low) {
+					continue;
+				}
+
 				InsertionQuery iq(writeData);
 				DeletionQuery dq(writeData.time);
 				std::mutex mut;

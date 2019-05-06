@@ -6,6 +6,9 @@
 #define NUM_QUOTE_PROPERTIES 4
 #define SYMBOL_BUF_LEN 7
 
+/*
+If low == 0, data is invalid
+*/
 class DbData {
 public:
 	char symbol[SYMBOL_BUF_LEN];

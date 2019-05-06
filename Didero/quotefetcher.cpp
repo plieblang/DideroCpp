@@ -46,10 +46,19 @@ time_t convertFriendlyToTimestamp(crs_string &date, const crs_string &time) {
 	return mktime(&formattedTime);
 }
 
+//TODO consider using an optional
 DbData createQuote(pplx::task<web::json::value> &previousTask) {
 	web::json::value jsonData = previousTask.get();
 	double low, high, open, close;
 	time_t timestamp;
+
+	//something happened; probably hit the api limit
+	if (!jsonData.has_field(U("Meta Data"))) {
+		std::cout << "Received invalid JSON\n";
+		DbData noVal;
+		noVal.low = 0;
+		return noVal;
+	}
 
 	auto metadata = jsonData[U("Meta Data")];
 	auto interval = metadata[U("4. Last Refreshed")];
