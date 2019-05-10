@@ -1,7 +1,7 @@
 #include "main.h"
 
 #define WRITE_INTERVAL 180000
-#define FETCH_INTERVAL 60000
+#define FETCH_INTERVAL 180000
 #define FETCHES_PER_WRITE WRITE_INTERVAL / FETCH_INTERVAL
 
 int initializeDb(MYSQL *connection) {
@@ -30,7 +30,7 @@ int main() {
 
 	int rv = -1;
 	if (connection) {
-		rv = initializeDb(connection);
+		rv = 0;// initializeDb(connection);
 	}
 
 	if (!rv) {
@@ -39,44 +39,52 @@ int main() {
 		//Once all those tasks have returned, get the data from them and write it to the db
 		std::vector<pplx::task<void>> taskList(FETCHES_PER_WRITE);
 
+		std::mutex mut;
+
 		//FIXME do actual error handling
 		while (true) {
 			try {
-				std::vector<DbData> quotes(FETCHES_PER_WRITE);
+				std::vector<std::optional<DbData>> quotes(FETCHES_PER_WRITE);
 				for (int i = 0; i < FETCHES_PER_WRITE; i++) {
 					web::uri url(constructURL(forexUrl, forexApiKey, U("USD"), U("EUR")));
-					taskList[i] = storeFromQuoteAfterDelay(connection, url, quotes[i], FETCH_INTERVAL * i);
+					taskList[i] = storeFromQuoteAfterDelay(connection, url, quotes[i], FETCH_INTERVAL * (i + 1));
 				}
 				auto fetchTasks = pplx::when_all(begin(taskList), end(taskList));
 				fetchTasks.wait();
 
 				//set the data that we're actually going to write
-				DbData writeData(quotes[0]);
+				DbData writeData(quotes[0].value());
+				bool valid = true;
 				for (const auto &quote : quotes) {
-					if (quote.low < writeData.low) {
-						writeData.low = quote.low;
+					if (quote.has_value()) {
+						if (quote.value().low < writeData.low) {
+							writeData.low = quote.value().low;
+						}
+						if (quote.value().high > writeData.high) {
+							writeData.high = quote.value().high;
+						}
+					} else {
+						valid = false;
+						break;
 					}
-					if (quote.high > writeData.high) {
-						writeData.high = quote.high;
-					}
+					
 				}
-				writeData.close = quotes[quotes.size() - 1].close;
-				writeData.time = quotes[quotes.size() - 1].time;
+				writeData.close = quotes[quotes.size() - 1].value().close;
+				writeData.time = quotes[quotes.size() - 1].value().time;
 
 				//make sure we have valid data
-				if (!writeData.low) {
+				if (!valid) {
 					continue;
 				}
 
 				InsertionQuery iq(writeData);
 				DeletionQuery dq(writeData.time);
-				std::mutex mut;
-				//FIXME needs error checking
-				auto insertionTask = iq.execute(connection);
-				insertionTask.wait();
-				auto deletionTask = dq.execute(connection);
+				iq.execute(connection);
+				dq.execute(connection);
+			} catch (std::exception e) {
+				std::cout << e.what() << "\n";
 			} catch (...) {
-				//FIXME log or do something here
+				std::cout << "exception handled\n";
 			}
 		}
 	}

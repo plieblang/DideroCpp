@@ -5,6 +5,6 @@
 #include "dbdata.h"
 #include "dbinfo.h"
 
-pplx::task<void> storeFromQuoteAfterDelay(MYSQL *connection, const web::uri &url, DbData &dbData, int milliDelay);
+pplx::task<void> storeFromQuoteAfterDelay(MYSQL *connection, const web::uri &url, std::optional<DbData> &dbData, int milliDelay);
 
 #endif

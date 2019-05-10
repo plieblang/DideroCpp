@@ -16,6 +16,7 @@
 #include <fstream>
 #include <iostream>
 #include <mutex>
+#include <optional>
 #include <queue>
 #include <string>
 #include <thread>

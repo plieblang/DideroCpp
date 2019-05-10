@@ -14,7 +14,14 @@ time_t convertFriendlyToTimestamp(crs_string &date, const crs_string &time) {
 	wchar_t *token = wcstok_s(tempStr, L"-", &buf);
 	int counter = 0;
 	while (token) {
-		int val = std::stoi(token);
+		int val = 0;
+		try {
+			val = std::stoi(token);
+		} catch (std::invalid_argument e) {
+			std::cout << "Received data with invalid date: " << token << "\n";
+			return -1;
+		}
+
 		if (!counter) {
 			formattedTime.tm_year = val - 1900;
 		} else if (counter == 1) {
@@ -31,7 +38,14 @@ time_t convertFriendlyToTimestamp(crs_string &date, const crs_string &time) {
 	token = wcstok_s(tempStr, L":", &buf);
 	counter = 0;
 	while (token) {
-		int val = std::stoi(token);
+		int val = 0;
+		try {
+			val = std::stoi(token);
+		} catch (std::invalid_argument e) {
+			std::cout << "Received data with invalid time: " << token << "\n";
+			return -1;
+		}
+
 		if (!counter) {
 			formattedTime.tm_hour = val;
 		} else if (counter == 1) {
@@ -47,7 +61,7 @@ time_t convertFriendlyToTimestamp(crs_string &date, const crs_string &time) {
 }
 
 //TODO consider using an optional
-DbData createQuote(pplx::task<web::json::value> &previousTask) {
+std::optional<DbData> createQuote(pplx::task<web::json::value> &previousTask) {
 	web::json::value jsonData = previousTask.get();
 	double low, high, open, close;
 	time_t timestamp;
@@ -55,9 +69,13 @@ DbData createQuote(pplx::task<web::json::value> &previousTask) {
 	//something happened; probably hit the api limit
 	if (!jsonData.has_field(U("Meta Data"))) {
 		std::cout << "Received invalid JSON\n";
-		DbData noVal;
-		noVal.low = 0;
-		return noVal;
+		utility::stringstream_t stream;
+		jsonData.serialize(stream);
+		crs_string receivedData;
+		stream >> receivedData;
+		std::cout << receivedData.c_str() << "\n";
+
+		return std::nullopt;
 	}
 
 	auto metadata = jsonData[U("Meta Data")];
@@ -69,10 +87,14 @@ DbData createQuote(pplx::task<web::json::value> &previousTask) {
 		interval.serialize(stream);
 		stream >> date;
 		stream >> timeStr;
-		//string off the quotation marks that are included for some reason
+		//strip off the quotation marks that are included for some reason
 		date = date.substr(1, date.size() - 1);
 		timeStr = timeStr.substr(0, timeStr.size() - 1);
 		timestamp = convertFriendlyToTimestamp(date, timeStr);
+	}
+
+	if (timestamp < 0) {
+		return std::nullopt;
 	}
 
 	auto entry = jsonData[U("Time Series FX (1min)")];
@@ -85,14 +107,22 @@ DbData createQuote(pplx::task<web::json::value> &previousTask) {
 		stream >> propStr;
 		propStr = propStr.substr(1, propStr.size() - 2);
 
+		double value = 0;
+		try {
+			value = std::stod(propStr);
+		} catch (std::invalid_argument e) {
+			std::cout << e.what();
+			return std::nullopt;
+		}
+
 		if (prop == U("1. open")) {
-			open = std::stod(propStr);
+			open = value;
 		} else if (prop == U("2. high")) {
-			high = std::stod(propStr);
+			high = value;
 		} else if (prop == U("3. low")) {
-			low = std::stod(propStr);
+			low = value;
 		} else if (prop == U("4. close")) {
-			close = std::stod(propStr);
+			close = value;
 		}
 	}
 
@@ -100,7 +130,7 @@ DbData createQuote(pplx::task<web::json::value> &previousTask) {
 	return rv;
 }
 
-pplx::task<void> storeFromQuoteAfterDelay(MYSQL *connection, const web::uri &url, DbData &dbData, int milliDelay) {
+pplx::task<void> storeFromQuoteAfterDelay(MYSQL *connection, const web::uri &url, std::optional<DbData> &dbData, int milliDelay) {
 	std::this_thread::sleep_for(std::chrono::milliseconds(milliDelay));
 
 	web::http::client::http_client client(url);
