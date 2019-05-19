@@ -17,8 +17,43 @@ crs_string constructURL(const crs_string forexUrl, const crs_string forexApiKey,
 	return forexUrl + U("&from_symbol=") + firstCurrency + U("&to_symbol=") + secondCurrency + U("&interval=1min&apikey=") + forexApiKey;
 }
 
-int main() {
+//@platformspecific
+crs_string getPassword() {
+	std::cout << "Password: ";
+
+	HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE);
+	DWORD mode;
+	GetConsoleMode(hStdin, &mode);
+	//disable echoing only for password input
+	mode &= ~ENABLE_ECHO_INPUT;
+	SetConsoleMode(hStdin, mode);
+
+	crs_string password;
+	std::wcin >> password;
+	
+	mode |= ENABLE_ECHO_INPUT;
+	SetConsoleMode(hStdin, mode);
+
+	std::cout << "\n";
+
+	return password;
+}
+
+int main(int argc, char *argv[]) {
 	crs_string forexUrl, forexApiKey, dbUrl, dbUsername, dbPassword;
+
+	//given neither usename nor password
+	if (argc == 1) {
+		std::cout << "Username: ";
+		std::wcin >> dbUsername;
+		std::cout << "\n";
+	} else {
+		dbUsername = utility::conversions::to_string_t(argv[1]);
+	}
+
+	//read the password no matter what so that it's never shown openly
+	dbPassword = getPassword();
+
 	utility::ifstream_t in("connection_info.txt");
 	in >> forexUrl >> forexApiKey >> dbUrl >> dbUsername >> dbPassword;
 	DbInfo db(dbUrl, dbUsername, dbPassword);
@@ -30,6 +65,7 @@ int main() {
 
 	int rv = -1;
 	if (connection) {
+		std::cout << "Connection established\n";
 		rv = 0;// initializeDb(connection);
 	}
 

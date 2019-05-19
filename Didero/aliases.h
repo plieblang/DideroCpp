@@ -22,6 +22,10 @@
 #include <thread>
 #include <vector>
 
+#ifdef WIN32
+#include <Windows.h>
+#endif
+
 using crs_string = utility::string_t;
 
 #endif
