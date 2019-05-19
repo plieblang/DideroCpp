@@ -10,4 +10,10 @@
 
 #define DB_PORT 3306
 
+#define WRITE_INTERVAL 180000
+#define FETCH_INTERVAL 180000
+#define FETCHES_PER_WRITE WRITE_INTERVAL / FETCH_INTERVAL
+
+#define CRED_NAME L"DideroBackend"
+
 #endif

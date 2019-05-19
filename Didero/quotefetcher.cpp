@@ -60,7 +60,6 @@ time_t convertFriendlyToTimestamp(crs_string &date, const crs_string &time) {
 	return mktime(&formattedTime);
 }
 
-//TODO consider using an optional
 std::optional<DbData> createQuote(pplx::task<web::json::value> &previousTask) {
 	web::json::value jsonData = previousTask.get();
 	double low, high, open, close;

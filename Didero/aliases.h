@@ -24,6 +24,7 @@
 
 #ifdef WIN32
 #include <Windows.h>
+#include <wincred.h>
 #endif
 
 using crs_string = utility::string_t;

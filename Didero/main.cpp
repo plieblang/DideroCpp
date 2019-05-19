@@ -1,9 +1,5 @@
 #include "main.h"
 
-#define WRITE_INTERVAL 180000
-#define FETCH_INTERVAL 180000
-#define FETCHES_PER_WRITE WRITE_INTERVAL / FETCH_INTERVAL
-
 int initializeDb(MYSQL *connection) {
 	int rv = 0;// mysql_query(connection, "CREATE DATABASE quotedb");
 	if (!rv) {
@@ -39,23 +35,88 @@ crs_string getPassword() {
 	return password;
 }
 
+//@platformspecific
+bool saveCredential(const crs_string &user, const crs_string &pass) {
+	bool rv = false;
+
+	CREDENTIALW cred;
+	memset(&cred, 0, sizeof(cred));
+
+	cred.TargetName = (LPWSTR)CRED_NAME;
+	cred.Type = CRED_TYPE_GENERIC;
+	cred.Persist = CRED_PERSIST_LOCAL_MACHINE;
+
+	wchar_t userName[CRED_MAX_USERNAME_LENGTH];
+	cred.UserName = userName;
+	wcscpy_s(cred.UserName, CRED_MAX_USERNAME_LENGTH, user.c_str());
+
+	BYTE blob[CRED_MAX_CREDENTIAL_BLOB_SIZE];
+	cred.CredentialBlob = blob;
+	size_t len;
+	wcstombs_s(&len, (char*)cred.CredentialBlob, CRED_MAX_CREDENTIAL_BLOB_SIZE, pass.c_str(), CRED_MAX_CREDENTIAL_BLOB_SIZE - 1);
+	cred.CredentialBlobSize = strlen((const char*)cred.CredentialBlob);
+
+	if (CredWriteW(&cred, NULL)) {
+		rv = true;
+	} else {
+		DWORD err = GetLastError();
+		switch (err) {
+		case ERROR_INVALID_PARAMETER: std::cout << "Invalid parameter\n";
+		case ERROR_BAD_USERNAME: std::cout << "Bad username\n";
+		default: std::cout << err << "\n";
+		}
+	}
+
+	return rv;
+}
+
+/*
+If we're given neither username nor password, look for cached credentials
+If those are found, silently connect; otherwise, prompt user to enter them
+If we're given a username, ask for password as well
+This works for now when we only have one user
+
+@platformspecific
+*/
 int main(int argc, char *argv[]) {
 	crs_string forexUrl, forexApiKey, dbUrl, dbUsername, dbPassword;
 
-	//given neither usename nor password
+	bool credentialsCached = false;
+
+	PCREDENTIALW cred = nullptr;
+	//retrieve creds only if given no input
 	if (argc == 1) {
-		std::cout << "Username: ";
-		std::wcin >> dbUsername;
-		std::cout << "\n";
-	} else {
-		dbUsername = utility::conversions::to_string_t(argv[1]);
+		credentialsCached = CredReadW(CRED_NAME, CRED_TYPE_GENERIC, NULL, &cred) ? true : false;
 	}
 
-	//read the password no matter what so that it's never shown openly
-	dbPassword = getPassword();
+	if (credentialsCached) {
+		std::cout << "Using cached credentials\n";
+
+		dbUsername = { cred->UserName };
+		wchar_t pass[CRED_MAX_CREDENTIAL_BLOB_SIZE];
+		size_t len;
+		mbstowcs_s(&len, pass, (const char *)cred->CredentialBlob, CRED_MAX_CREDENTIAL_BLOB_SIZE);
+		dbPassword = { pass };
+	} else {
+		if (argc == 1) {
+			std::cout << "Username: ";
+			std::wcin >> dbUsername;
+			std::cout << "\n";
+		} else {
+			dbUsername = utility::conversions::to_string_t(argv[1]);
+		}
+
+		dbPassword = getPassword();
+
+		if (saveCredential(dbUsername, dbPassword)) {
+			std::cout << "New credentials saved\n";
+		} else std::cout << "Using unsaved new credentials\n";
+	}
+
+	CredFree(cred);
 
 	utility::ifstream_t in("connection_info.txt");
-	in >> forexUrl >> forexApiKey >> dbUrl >> dbUsername >> dbPassword;
+	in >> forexUrl >> forexApiKey >> dbUrl;
 	DbInfo db(dbUrl, dbUsername, dbPassword);
 
 	MYSQL *connection = mysql_init(NULL);
