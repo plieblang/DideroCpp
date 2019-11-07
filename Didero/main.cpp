@@ -121,6 +121,7 @@ int main(int argc, char *argv[]) {
 
 	MYSQL *connection = mysql_init(NULL);
 	if (connection) {
+		mysql_ssl_set(connection, NULL, NULL, "rds-ca-2019-root.pem", NULL, NULL);
 		connection = mysql_real_connect(connection, db.url, db.username, db.password, "quotedb", DB_PORT, NULL, 0);
 	}
 
